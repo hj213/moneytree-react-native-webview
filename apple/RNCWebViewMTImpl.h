@@ -14,29 +14,29 @@
 #import <UIKit/UIScrollView.h>
 #endif  // !TARGET_OS_OSX
 
-#import "RNCWebViewDecisionManager.h"
+#import "RNCWebViewMTDecisionManager.h"
 
-typedef enum RNCWebViewPermissionGrantType : NSUInteger {
-  RNCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt,
-  RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny,
-  RNCWebViewPermissionGrantType_Deny,
-  RNCWebViewPermissionGrantType_Grant,
-  RNCWebViewPermissionGrantType_Prompt
-} RNCWebViewPermissionGrantType;
+typedef enum RNCWebViewMTPermissionGrantType : NSUInteger {
+  RNCWebViewMTPermissionGrantType_GrantIfSameHost_ElsePrompt,
+  RNCWebViewMTPermissionGrantType_GrantIfSameHost_ElseDeny,
+  RNCWebViewMTPermissionGrantType_Deny,
+  RNCWebViewMTPermissionGrantType_Grant,
+  RNCWebViewMTPermissionGrantType_Prompt
+} RNCWebViewMTPermissionGrantType;
 
-@class RNCWebViewImpl;
+@class RNCWebViewMTImpl;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RNCWebViewDelegate <NSObject>
+@protocol RNCWebViewMTDelegate <NSObject>
 
-- (BOOL)webView:(RNCWebViewImpl *)webView
+- (BOOL)webView:(RNCWebViewMTImpl *)webView
 shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
    withCallback:(RCTDirectEventBlock)callback;
 
 @end
 
-@interface RNCWeakScriptMessageDelegate : NSObject<WKScriptMessageHandler>
+@interface RNCWeakScriptMessageDelegateMT : NSObject<WKScriptMessageHandler>
 
 @property (nonatomic, weak, nullable) id<WKScriptMessageHandler> scriptDelegate;
 
@@ -44,7 +44,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
-@interface RNCWebViewImpl : RCTView
+@interface RNCWebViewMTImpl : RCTView
 @property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
@@ -58,7 +58,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 @property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
 
 
-@property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
+@property (nonatomic, weak) id<RNCWebViewMTDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;
 @property (nonatomic, copy) NSString * _Nullable injectedJavaScript;
@@ -120,7 +120,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 #endif
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
-@property (nonatomic, assign) RNCWebViewPermissionGrantType mediaCapturePermissionGrantType;
+@property (nonatomic, assign) RNCWebViewMTPermissionGrantType mediaCapturePermissionGrantType;
 #endif
 
 #if !TARGET_OS_OSX

@@ -11,12 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RNCWebView : RCTViewComponentView
+@interface RNCWebViewMT : RCTViewComponentView
 @end
 
 namespace facebook {
 namespace react {
-    bool operator==(const RNCWebViewMenuItemsStruct& a, const RNCWebViewMenuItemsStruct& b)
+    bool operator==(const RNCWebViewMTMenuItemsStruct& a, const RNCWebViewMTMenuItemsStruct& b)
     {
         return b.key == a.key && b.label == a.label;
     }

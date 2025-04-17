@@ -1,17 +1,14 @@
 {
-  "name": "react-native-webview",
-  "description": "React Native WebView component for iOS, Android, macOS, and Windows",
+  "name": "moneytree-react-native-webview",
+  "description": "custom moneytree webview from react-native-webview",
   "main": "index.js",
   "main-internal": "src/index.ts",
   "react-native": "src/index.ts",
   "typings": "index.d.ts",
-  "author": "Jamon Holmgren <jamon@infinite.red>",
-  "contributors": [
-    "Thibault Malbranche <malbranche.thibault@gmail.com>"
-  ],
+  "author": "lumigloo",
   "license": "MIT",
-  "version": "13.6.4",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "version": "13.6.4-mt.0",
+  "homepage": "https://github.com/hj213/moneytree-react-native-webview#readme",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
