@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview;
+package com.moneytree.webview;
 
 import android.Manifest;
 import android.app.Activity;
@@ -44,8 +44,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static android.app.Activity.RESULT_OK;
 
-public class RNCWebViewModuleImpl implements ActivityEventListener {
-    public static final String NAME = "RNCWebView";
+public class RNCWebViewModuleImplMT implements ActivityEventListener {
+    public static final String NAME = "RNCWebViewMT";
 
     public static final int PICKER = 1;
     public static final int PICKER_LEGACY = 3;
@@ -60,7 +60,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
     private File mOutputImage;
     private File mOutputVideo;
 
-    public RNCWebViewModuleImpl(ReactApplicationContext context) {
+    public RNCWebViewModuleImplMT(ReactApplicationContext context) {
         mContext = context;
         context.addActivityEventListener(this);
     }
@@ -85,7 +85,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         // the camera activity doesn't properly return the filename* (I think?) so we use
         // this filename instead
         switch (requestCode) {
-            case RNCWebViewModuleImpl.PICKER:
+            case RNCWebViewModuleImplMT.PICKER:
                 if (resultCode != RESULT_OK) {
                     if (mFilePathCallback != null) {
                         mFilePathCallback.onReceiveValue(null);
@@ -100,7 +100,7 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
                     }
                 }
                 break;
-            case RNCWebViewModuleImpl.PICKER_LEGACY:
+            case RNCWebViewModuleImplMT.PICKER_LEGACY:
                 if (resultCode != RESULT_OK) {
                     mFilePathCallbackLegacy.onReceiveValue(null);
                 } else {

@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.reactnativecommunity.webview">
+  package="com.moneytree.webview">
 
   <application>
     <provider
-      android:name=".RNCWebViewFileProvider"
+      android:name=".RNCWebViewFileProviderMT"
       android:authorities="${applicationId}.fileprovider"
       android:exported="false"
       android:grantUriPermissions="true">

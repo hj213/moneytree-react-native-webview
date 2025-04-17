@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview;
+package com.moneytree.webview;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -29,14 +29,17 @@ import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 import com.facebook.react.uimanager.UIManagerHelper;
-import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
-import com.reactnativecommunity.webview.events.TopOpenWindowEvent;
+import com.moneytree.webview.events.TopLoadingProgressEvent;
+import com.moneytree.webview.events.TopOpenWindowEvent;
+import com.moneytree.webview.RNCWebView;
+import com.moneytree.webview.RNCWebViewModule;
+import com.moneytree.webview.RNCWebViewWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RNCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
+public class RNCWebChromeClientMT extends WebChromeClient implements LifecycleEventListener {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
 
@@ -50,7 +53,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
 
     protected static final int COMMON_PERMISSION_REQUEST = 3;
 
-    protected RNCWebView mWebView;
+    protected RNCWebViewMT mWebView;
 
     protected View mVideoView;
     protected WebChromeClient.CustomViewCallback mCustomViewCallback;
@@ -76,18 +79,17 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     // Pending Android permissions for the next request
     protected List<String> pendingPermissions = new ArrayList<>();
 
-    protected RNCWebView.ProgressChangedFilter progressChangedFilter = null;
+    protected RNCWebViewMT.ProgressChangedFilter progressChangedFilter = null;
     protected boolean mAllowsProtectedMedia = false;
 
     protected boolean mHasOnOpenWindowEvent = false;
 
-    public RNCWebChromeClient(RNCWebView webView) {
+    public RNCWebChromeClientMT(RNCWebViewMT webView) {
         this.mWebView = webView;
     }
 
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-
         final WebView newWebView = new WebView(view.getContext());
 
         if(mHasOnOpenWindowEvent) {
@@ -97,7 +99,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
                 WritableMap event = Arguments.createMap();
                 event.putString("targetUrl", url);
 
-                ((RNCWebView) view).dispatchEvent(
+                ((RNCWebViewMT) view).dispatchEvent(
                     view,
                     new TopOpenWindowEvent(RNCWebViewWrapper.getReactTagFromWebView(view), event)
                 );
@@ -139,7 +141,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
+        UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag)
+            .dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
     }
 
     @Override
@@ -317,15 +320,15 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
     };
 
     protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
+        this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModuleMT.class).startPhotoPickerIntent(filePathCallback, acceptType);
     }
 
     protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, "");
+        this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModuleMT.class).startPhotoPickerIntent(filePathCallback, "");
     }
 
     protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-      this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptType);
+        this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModuleMT.class).startPhotoPickerIntent(filePathCallback, acceptType);
     }
 
     @Override
@@ -333,7 +336,8 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
 
-        return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModule.class).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
+        return this.mWebView.getThemedReactContext().getNativeModule(RNCWebViewModuleMT.class)
+            .startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple, fileChooserParams.isCaptureEnabled());
     }
 
     @Override
@@ -353,7 +357,7 @@ public class RNCWebChromeClient extends WebChromeClient implements LifecycleEven
         return this.mWebView.getThemedReactContext().getCurrentActivity().findViewById(android.R.id.content);
     }
 
-    public void setProgressChangedFilter(RNCWebView.ProgressChangedFilter filter) {
+    public void setProgressChangedFilter(RNCWebViewMT.ProgressChangedFilter filter) {
         progressChangedFilter = filter;
     }
 

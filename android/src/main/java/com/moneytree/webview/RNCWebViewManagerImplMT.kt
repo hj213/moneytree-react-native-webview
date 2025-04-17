@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview
+package com.moneytree.webview
 
 import android.app.DownloadManager
 import android.content.pm.ActivityInfo
@@ -31,13 +31,13 @@ import java.util.Locale
 
 val invalidCharRegex = "[\\\\/%\"]".toRegex()
 
-class RNCWebViewManagerImpl {
+class RNCWebViewManagerImplMT {
     companion object {
-        const val NAME = "RNCWebView"
+        const val NAME = "RNCWebViewMT"
     }
 
-    private val TAG = "RNCWebViewManagerImpl"
-    private var mWebViewConfig: RNCWebViewConfig = RNCWebViewConfig { webView: WebView? -> }
+    private val TAG = "RNCWebViewManagerImplMT"
+    private var mWebViewConfig: RNCWebViewConfigMT = RNCWebViewConfigMT { webView: WebView? -> }
     private var mAllowsFullscreenVideo = false
     private var mAllowsProtectedMedia = false
     private var mDownloadingMessage: String? = null
@@ -58,16 +58,16 @@ class RNCWebViewManagerImpl {
     private val DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE =
         "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files."
 
-    fun createRNCWebViewInstance(context: ThemedReactContext): RNCWebView {
-        return RNCWebView(context)
+    fun createRNCWebViewInstance(context: ThemedReactContext): RNCWebViewMT {
+        return RNCWebViewMT(context)
     }
 
-    fun createViewInstance(context: ThemedReactContext): RNCWebViewWrapper {
+    fun createViewInstance(context: ThemedReactContext): RNCWebViewWrapperMT {
       val webView = createRNCWebViewInstance(context)
       return createViewInstance(context, webView);
     }
 
-    fun createViewInstance(context: ThemedReactContext, webView: RNCWebView): RNCWebViewWrapper {
+    fun createViewInstance(context: ThemedReactContext, webView: RNCWebViewMT): RNCWebViewWrapperMT {
         setupWebChromeClient(webView)
         context.addLifecycleEventListener(webView)
         mWebViewConfig.configWebView(webView)
@@ -92,7 +92,7 @@ class RNCWebViewManagerImpl {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = webView.themedReactContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
+            val module = webView.themedReactContext.getNativeModule(RNCWebViewMTModule::class.java) ?: return@DownloadListener
             val request: DownloadManager.Request = try {
                 DownloadManager.Request(Uri.parse(url))
             } catch (e: IllegalArgumentException) {
@@ -135,17 +135,17 @@ class RNCWebViewManagerImpl {
                 )
             }
         })
-        return RNCWebViewWrapper(context, webView)
+        return RNCWebViewWrapperMT(context, webView)
     }
 
     private fun setupWebChromeClient(
-        webView: RNCWebView,
+        webView: RNCWebViewMT,
     ) {
         val activity = webView.themedReactContext.currentActivity
         if (mAllowsFullscreenVideo && activity != null) {
             val initialRequestedOrientation = activity.requestedOrientation
-            val webChromeClient: RNCWebChromeClient =
-                object : RNCWebChromeClient(webView) {
+            val webChromeClient: RNCWebChromeClientMT =
+                object : RNCWebChromeClientMT(webView) {
                     override fun getDefaultVideoPoster(): Bitmap? {
                         return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                     }
@@ -210,9 +210,9 @@ class RNCWebViewManagerImpl {
             webChromeClient.setHasOnOpenWindowEvent(mHasOnOpenWindowEvent);
             webView.webChromeClient = webChromeClient
         } else {
-            var webChromeClient = webView.webChromeClient as RNCWebChromeClient?
+            var webChromeClient = webView.webChromeClient as RNCWebChromeClientMT?
             webChromeClient?.onHideCustomView()
-            webChromeClient = object : RNCWebChromeClient(webView) {
+            webChromeClient = object : RNCWebChromeClientMT(webView) {
                 override fun getDefaultVideoPoster(): Bitmap? {
                     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
                 }
@@ -223,12 +223,12 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setUserAgent(viewWrapper: RNCWebViewWrapper, userAgent: String?) {
+    fun setUserAgent(viewWrapper: RNCWebViewWrapperMT, userAgent: String?) {
         mUserAgent = userAgent
         setUserAgentString(viewWrapper)
     }
 
-    fun setApplicationNameForUserAgent(viewWrapper: RNCWebViewWrapper, applicationName: String?) {
+    fun setApplicationNameForUserAgent(viewWrapper: RNCWebViewWrapperMT, applicationName: String?) {
         when {
             applicationName != null -> {
                 val defaultUserAgent = WebSettings.getDefaultUserAgent(viewWrapper.webView.context)
@@ -241,7 +241,7 @@ class RNCWebViewManagerImpl {
         setUserAgentString(viewWrapper)
     }
 
-    private fun setUserAgentString(viewWrapper: RNCWebViewWrapper) {
+    private fun setUserAgentString(viewWrapper: RNCWebViewWrapperMT) {
         val view = viewWrapper.webView
         when {
             mUserAgent != null -> {
@@ -256,7 +256,7 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setBasicAuthCredential(viewWrapper: RNCWebViewWrapper, credential: ReadableMap?) {
+    fun setBasicAuthCredential(viewWrapper: RNCWebViewWrappeMT, credential: ReadableMap?) {
         var basicAuthCredential: RNCBasicAuthCredential? = null
         if (credential != null) {
             if (credential.hasKey("username") && credential.hasKey("password")) {
@@ -268,7 +268,7 @@ class RNCWebViewManagerImpl {
         viewWrapper.webView.setBasicAuthCredential(basicAuthCredential)
     }
 
-    fun onDropViewInstance(viewWrapper: RNCWebViewWrapper) {
+    fun onDropViewInstance(viewWrapper: RNCWebViewWrapperMT) {
         val webView = viewWrapper.webView
         webView.themedReactContext.removeLifecycleEventListener(webView)
         webView.cleanupCallbacksAndDestroy()
@@ -305,7 +305,7 @@ class RNCWebViewManagerImpl {
         .build()
     }
 
-    fun receiveCommand(viewWrapper: RNCWebViewWrapper, commandId: String, args: ReadableArray) {
+    fun receiveCommand(viewWrapper: RNCWebViewWrapperMT, commandId: String, args: ReadableArray) {
       val webView = viewWrapper.webView
       when (commandId) {
         "goBack" -> webView.goBack()
@@ -349,7 +349,7 @@ class RNCWebViewManagerImpl {
       }
     }
 
-    fun setMixedContentMode(viewWrapper: RNCWebViewWrapper, mixedContentMode: String?) {
+    fun setMixedContentMode(viewWrapper: RNCWebViewWrapperMT, mixedContentMode: String?) {
         val view = viewWrapper.webView
         if (mixedContentMode == null || "never" == mixedContentMode) {
             view.settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
@@ -360,7 +360,7 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setAllowUniversalAccessFromFileURLs(viewWrapper: RNCWebViewWrapper, allow: Boolean) {
+    fun setAllowUniversalAccessFromFileURLs(viewWrapper: RNCWebViewWrapperMT, allow: Boolean) {
         viewWrapper.webView.settings.allowUniversalAccessFromFileURLs = allow
     }
 
@@ -373,7 +373,7 @@ class RNCWebViewManagerImpl {
             ?: DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE
     }
 
-    fun setSource(viewWrapper: RNCWebViewWrapper, source: ReadableMap?, newArch: Boolean = true) {
+    fun setSource(viewWrapper: RNCWebViewWrapperMT, source: ReadableMap?, newArch: Boolean = true) {
         val view = viewWrapper.webView
         if (source != null) {
             if (source.hasKey("html")) {
@@ -447,17 +447,17 @@ class RNCWebViewManagerImpl {
         view.loadUrl(BLANK_URL)
     }
 
-    fun setMessagingModuleName(viewWrapper: RNCWebViewWrapper, value: String?) {
+    fun setMessagingModuleName(viewWrapper: RNCWebViewWrapperMT, value: String?) {
         val view = viewWrapper.webView
         view.messagingModuleName = value
     }
 
-    fun setCacheEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setCacheEnabled(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
       val view = viewWrapper.webView
       view.settings.cacheMode = if (enabled) WebSettings.LOAD_DEFAULT else WebSettings.LOAD_NO_CACHE
     }
 
-    fun setIncognito(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setIncognito(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
         val view = viewWrapper.webView
         // Don't do anything when incognito is disabled
         if (!enabled) {
@@ -478,83 +478,83 @@ class RNCWebViewManagerImpl {
         view.settings.saveFormData = false;
     }
 
-    fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapper, injectedJavaScript: String?) {
+    fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapperMT, injectedJavaScript: String?) {
         val view = viewWrapper.webView
         view.injectedJS = injectedJavaScript
     }
 
-    fun setInjectedJavaScriptBeforeContentLoaded(viewWrapper: RNCWebViewWrapper, value: String?) {
+    fun setInjectedJavaScriptBeforeContentLoaded(viewWrapper: RNCWebViewWrapperMT, value: String?) {
         val view = viewWrapper.webView
         view.injectedJSBeforeContentLoaded = value
     }
 
-    fun setInjectedJavaScriptForMainFrameOnly(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setInjectedJavaScriptForMainFrameOnly(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.injectedJavaScriptForMainFrameOnly = value
     }
 
-    fun setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setInjectedJavaScriptBeforeContentLoadedForMainFrameOnly(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.injectedJavaScriptBeforeContentLoadedForMainFrameOnly = value
     }
 
-    fun setInjectedJavaScriptObject(viewWrapper: RNCWebViewWrapper, value: String?) {
+    fun setInjectedJavaScriptObject(viewWrapper: RNCWebViewWrapperMT, value: String?) {
         val view = viewWrapper.webView
         view.setInjectedJavaScriptObject(value)
     }
 
-    fun setJavaScriptCanOpenWindowsAutomatically(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setJavaScriptCanOpenWindowsAutomatically(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.javaScriptCanOpenWindowsAutomatically = value
     }
 
-    fun setShowsVerticalScrollIndicator(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setShowsVerticalScrollIndicator(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.isVerticalScrollBarEnabled = value
     }
 
-    fun setShowsHorizontalScrollIndicator(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setShowsHorizontalScrollIndicator(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.isHorizontalScrollBarEnabled = value
     }
 
-    fun setMessagingEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setMessagingEnabled(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.setMessagingEnabled(value)
     }
 
-    fun setMediaPlaybackRequiresUserAction(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setMediaPlaybackRequiresUserAction(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.mediaPlaybackRequiresUserGesture = value
     }
 
-    fun setHasOnScroll(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setHasOnScroll(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.setHasScrollEvent(value)
     }
 
-    fun setJavaScriptEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setJavaScriptEnabled(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
         val view = viewWrapper.webView
         view.settings.javaScriptEnabled = enabled
     }
 
-    fun setAllowFileAccess(viewWrapper: RNCWebViewWrapper, allowFileAccess: Boolean) {
+    fun setAllowFileAccess(viewWrapper: RNCWebViewWrapperMT, allowFileAccess: Boolean) {
         val view = viewWrapper.webView
         view.settings.allowFileAccess = allowFileAccess;
     }
 
-    fun setAllowFileAccessFromFileURLs(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setAllowFileAccessFromFileURLs(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.allowFileAccessFromFileURLs = value;
     }
 
-    fun setAllowsFullscreenVideo(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setAllowsFullscreenVideo(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         mAllowsFullscreenVideo = value
         setupWebChromeClient(view)
     }
 
-    fun setAndroidLayerType(viewWrapper: RNCWebViewWrapper, layerTypeString: String?) {
+    fun setAndroidLayerType(viewWrapper: RNCWebViewWrapperMT, layerTypeString: String?) {
         val view = viewWrapper.webView
         val layerType = when (layerTypeString) {
             "hardware" -> View.LAYER_TYPE_HARDWARE
@@ -564,7 +564,7 @@ class RNCWebViewManagerImpl {
         view.setLayerType(layerType, null)
     }
 
-    fun setCacheMode(viewWrapper: RNCWebViewWrapper, cacheModeString: String?) {
+    fun setCacheMode(viewWrapper: RNCWebViewWrapperMT, cacheModeString: String?) {
         val view = viewWrapper.webView
         view.settings.cacheMode = when (cacheModeString) {
             "LOAD_CACHE_ONLY" -> WebSettings.LOAD_CACHE_ONLY
@@ -575,7 +575,7 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setDomStorageEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setDomStorageEnabled(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.domStorageEnabled = value
     }
@@ -584,7 +584,7 @@ class RNCWebViewManagerImpl {
         mDownloadingMessage = value
     }
 
-    fun setForceDarkOn(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setForceDarkOn(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
         val view = viewWrapper.webView
         // Only Android 10+ support dark mode
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
@@ -608,7 +608,7 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setGeolocationEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setGeolocationEnabled(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.setGeolocationEnabled(value)
     }
@@ -617,18 +617,18 @@ class RNCWebViewManagerImpl {
         mLackPermissionToDownloadMessage = value
     }
 
-    fun setHasOnOpenWindowEvent(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setHasOnOpenWindowEvent(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         mHasOnOpenWindowEvent = value
         setupWebChromeClient(view)
     }
 
-    fun setMinimumFontSize(viewWrapper: RNCWebViewWrapper, value: Int) {
+    fun setMinimumFontSize(viewWrapper: RNCWebViewWrapperMT, value: Int) {
         val view = viewWrapper.webView
         view.settings.minimumFontSize = value
     }
 
-    fun setAllowsProtectedMedia(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setAllowsProtectedMedia(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
       val view = viewWrapper.webView
       // This variable is used to keep consistency
       // in case a new WebChromeClient is created
@@ -636,23 +636,23 @@ class RNCWebViewManagerImpl {
       mAllowsProtectedMedia = enabled
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val client = view.webChromeClient
-        if (client != null && client is RNCWebChromeClient) {
+        if (client != null && client is RNCWebChromeClientMT) {
           client.setAllowsProtectedMedia(enabled)
         }
       }
     }
 
-    fun setMenuCustomItems(viewWrapper: RNCWebViewWrapper, value: ReadableArray) {
+    fun setMenuCustomItems(viewWrapper: RNCWebViewWrapperMT, value: ReadableArray) {
         val view = viewWrapper.webView
         view.setMenuCustomItems(value.toArrayList() as List<Map<String, String>>)
     }
 
-    fun setNestedScrollEnabled(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setNestedScrollEnabled(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.nestedScrollEnabled = value
     }
 
-    fun setOverScrollMode(viewWrapper: RNCWebViewWrapper, overScrollModeString: String?) {
+    fun setOverScrollMode(viewWrapper: RNCWebViewWrapperMT, overScrollModeString: String?) {
         val view = viewWrapper.webView
         view.overScrollMode = when (overScrollModeString) {
             "never" -> View.OVER_SCROLL_NEVER
@@ -662,44 +662,44 @@ class RNCWebViewManagerImpl {
         }
     }
 
-    fun setSaveFormDataDisabled(viewWrapper: RNCWebViewWrapper, disabled: Boolean) {
+    fun setSaveFormDataDisabled(viewWrapper: RNCWebViewWrapperMT, disabled: Boolean) {
         val view = viewWrapper.webView
         view.settings.saveFormData = !disabled
     }
 
-    fun setScalesPageToFit(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setScalesPageToFit(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.loadWithOverviewMode = value
         view.settings.useWideViewPort = value
     }
 
-    fun setSetBuiltInZoomControls(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setSetBuiltInZoomControls(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.builtInZoomControls = value
     }
 
-    fun setSetDisplayZoomControls(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setSetDisplayZoomControls(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.displayZoomControls = value
 
     }
 
-    fun setSetSupportMultipleWindows(viewWrapper: RNCWebViewWrapper, value: Boolean) {
+    fun setSetSupportMultipleWindows(viewWrapper: RNCWebViewWrapperMT, value: Boolean) {
         val view = viewWrapper.webView
         view.settings.setSupportMultipleWindows(value)
     }
 
-    fun setTextZoom(viewWrapper: RNCWebViewWrapper, value: Int) {
+    fun setTextZoom(viewWrapper: RNCWebViewWrapperMT, value: Int) {
         val view = viewWrapper.webView
         view.settings.textZoom = value
     }
 
-    fun setThirdPartyCookiesEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
+    fun setThirdPartyCookiesEnabled(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
         val view = viewWrapper.webView
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, enabled)
     }
 
-    fun setWebviewDebuggingEnabled(viewWrapper: RNCWebViewWrapper, enabled: Boolean) {
-        RNCWebView.setWebContentsDebuggingEnabled(enabled)
+    fun setWebviewDebuggingEnabled(viewWrapper: RNCWebViewWrapperMT, enabled: Boolean) {
+        RNCWebViewMT.setWebContentsDebuggingEnabled(enabled)
     }
 }

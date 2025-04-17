@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview
+package com.moneytree.webview
 
 import android.content.Context
 import android.graphics.Color
@@ -12,7 +12,7 @@ import android.widget.FrameLayout
  * [com.facebook.react.views.view.ReactViewGroup] clips the canvas.
  * The WebView will then create an empty offscreen surface and NPE.
  */
-class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(context) {
+class RNCWebViewWrapperMT(context: Context, webView: RNCWebViewMT) : FrameLayout(context) {
   init {
     // We make the WebView as transparent on top of the container,
     // and let React Native sets background color for the container.
@@ -20,7 +20,7 @@ class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(con
     addView(webView)
   }
 
-  val webView: RNCWebView = getChildAt(0) as RNCWebView
+  val webView: RNCWebViewMT = getChildAt(0) as RNCWebViewWrapperMT
 
   companion object {
     /**
@@ -28,7 +28,7 @@ class RNCWebViewWrapper(context: Context, webView: RNCWebView) : FrameLayout(con
      */
     @JvmStatic
     fun getReactTagFromWebView(webView: WebView): Int {
-      // It is expected that the webView is enclosed by [RNCWebViewWrapper] as the first child.
+      // It is expected that the webView is enclosed by [RNCWebViewWrapperMT] as the first child.
       // Therefore, it must have a parent, and the parent ID is the reactTag.
       // In exceptional cases, such as receiving WebView messaging after the view has been unmounted,
       // the WebView will not have a parent.
