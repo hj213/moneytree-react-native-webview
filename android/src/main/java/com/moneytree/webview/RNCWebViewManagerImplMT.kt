@@ -141,7 +141,7 @@ class RNCWebViewManagerImplMT {
     private fun setupWebChromeClient(
         webView: RNCWebViewMT,
     ) {
-        val activity = webView.reactApplicationContext.currentActivity
+        val activity = webView.themedReactContext.currentActivity
         if (mAllowsFullscreenVideo && activity != null) {
             val initialRequestedOrientation = activity.requestedOrientation
             val webChromeClient: RNCWebChromeClientMT =
@@ -181,7 +181,7 @@ class RNCWebViewManagerImplMT {
                             // Same view hierarchy (no Modal), just hide the WebView then
                             mWebView.visibility = View.GONE
                         }
-                        mWebView.reactApplicationContext.addLifecycleEventListener(this)
+                        mWebView.themedReactContext.addLifecycleEventListener(this)
                     }
 
                     override fun onHideCustomView() {
@@ -203,7 +203,7 @@ class RNCWebViewManagerImplMT {
                         mVideoView = null
                         mCustomViewCallback = null
                         activity.requestedOrientation = initialRequestedOrientation
-                        mWebView.reactApplicationContext.removeLifecycleEventListener(this)
+                        mWebView.themedReactContext.removeLifecycleEventListener(this)
                     }
                 }
             webChromeClient.setAllowsProtectedMedia(mAllowsProtectedMedia);
@@ -270,7 +270,7 @@ class RNCWebViewManagerImplMT {
 
     fun onDropViewInstance(viewWrapper: RNCWebViewWrapperMT) {
         val webView = viewWrapper.webView
-        webView.reactApplicationContext.removeLifecycleEventListener(webView)
+        webView.themedReactContext.removeLifecycleEventListener(webView)
         webView.cleanupCallbacksAndDestroy()
         webView.mWebChromeClient = null
     }
