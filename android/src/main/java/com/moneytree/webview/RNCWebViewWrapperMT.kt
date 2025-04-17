@@ -20,7 +20,7 @@ class RNCWebViewWrapperMT(context: Context, webView: RNCWebViewMT) : FrameLayout
     addView(webView)
   }
 
-  val webView: RNCWebViewMT = getChildAt(0) as RNCWebViewWrapperMT
+  val webView: RNCWebViewMT = getChildAt(0) as RNCWebViewMT
 
   companion object {
     /**

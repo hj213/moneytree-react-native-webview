@@ -256,7 +256,7 @@ class RNCWebViewManagerImplMT {
         }
     }
 
-    fun setBasicAuthCredential(viewWrapper: RNCWebViewWrappeMT, credential: ReadableMap?) {
+    fun setBasicAuthCredential(viewWrapper: RNCWebViewWrapperMT, credential: ReadableMap?) {
         var basicAuthCredential: RNCBasicAuthCredential? = null
         if (credential != null) {
             if (credential.hasKey("username") && credential.hasKey("password")) {
