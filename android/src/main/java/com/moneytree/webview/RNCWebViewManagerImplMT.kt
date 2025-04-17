@@ -92,8 +92,7 @@ class RNCWebViewManagerImplMT {
         }
         webView.setDownloadListener(DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             webView.setIgnoreErrFailedForThisURL(url)
-            val module = webView.reactApplicationContext.getNativeModule(RNCWebViewModule::class.java) ?: return@DownloadListener
-            val request: DownloadManager.Request = try {
+            val module = webView.themedReactContext.getNativeModule(RNCWebViewMTModule::class.java) ?: return@DownloadListener            val request: DownloadManager.Request = try {
                 DownloadManager.Request(Uri.parse(url))
             } catch (e: IllegalArgumentException) {
                 Log.w(TAG, "Unsupported URI, aborting download", e)
